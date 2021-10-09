@@ -17,7 +17,8 @@ export const GlobalStoreActionType = {
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
-    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE"
+    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    ADD_NEW_LIST: "ADD_NEW_LIST",
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -41,6 +42,17 @@ export const useGlobalStore = () => {
     const storeReducer = (action) => {
         const { type, payload } = action;
         switch (type) {
+            // ADDS NEW LIST 
+            case GlobalStoreActionType.ADD_NEW_LIST: {
+                return setStore({
+                    idNamePairs: payload.idNamePairs,
+                    currentList: payload.top5List,
+                    newListCounter: store.newListCounter + 1,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                });
+            }
             // LIST UPDATE OF ITS NAME
             case GlobalStoreActionType.CHANGE_LIST_NAME: {
                 return setStore({
@@ -103,6 +115,43 @@ export const useGlobalStore = () => {
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
+
+    // THIS FUNCTION HANDLES CREATING A NEW LIST
+    store.createNewList = function() { 
+        
+        async function asyncCreateNewList() {
+            let newListPayload = {
+                "name": "Untitled" + store.newListCounter,
+                "items": [
+                    "?", "?", "?", "?", "?"
+                ],
+            };
+            let response = await api.createTop5List(newListPayload);
+            if (response.data.success) {
+                let newCurrentList = response.data.top5List;
+                async function asyncGetIdNamePairs() {
+                    let response = await api.getTop5ListPairs();
+                    if (response.data.success) {
+                        let newIdNamePairs = response.data.idNamePairs;
+                        storeReducer({
+                            type: GlobalStoreActionType.ADD_NEW_LIST,
+                            payload: {
+                                idNamePairs: newIdNamePairs,
+                                top5List: newCurrentList
+                            }
+                        });
+                    }
+                }
+                asyncGetIdNamePairs();
+            }
+        }
+        asyncCreateNewList();
+    }
+
+    // Function will handle deleting a list
+    store.deleteList = function(id) {
+
+    }
 
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
     store.changeListName = function (id, newName) {
