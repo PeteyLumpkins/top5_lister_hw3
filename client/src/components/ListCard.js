@@ -48,7 +48,8 @@ function ListCard(props) {
     }
 
     function handleToggleDeleteModel(event) {
-        
+        event.stopPropagation();
+        store.setMarkedDeleteList(event.target.id.substring("delete-list-".length));
     }
 
     function handleUpdateText(event) {

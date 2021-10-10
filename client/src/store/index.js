@@ -19,6 +19,8 @@ export const GlobalStoreActionType = {
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
     ADD_NEW_LIST: "ADD_NEW_LIST",
+    SET_LIST_MARKED_FOR_DELETION: "SET_LIST_MARKED_FOR_DELETION",
+    DELETE_MARKED_LIST: "DELETE_MARKED_LIST",
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -42,6 +44,28 @@ export const useGlobalStore = () => {
     const storeReducer = (action) => {
         const { type, payload } = action;
         switch (type) {
+            // DELETES THE MARKED LIST
+            case GlobalStoreActionType.DELETE_MARKED_LIST: {
+                return setStore({
+                    idNamePairs: payload.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                });
+            }
+            // SETS LIST TO BE MARKED FOR DELETION
+            case GlobalStoreActionType.SET_LIST_MARKED_FOR_DELETION: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: payload.id
+                });
+            }
             // ADDS NEW LIST 
             case GlobalStoreActionType.ADD_NEW_LIST: {
                 return setStore({
@@ -116,6 +140,37 @@ export const useGlobalStore = () => {
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
+    // THIS FUNCTION HANDLES SETTING THE LIST WE WANT TO MARK FOR DELETION
+    store.setMarkedDeleteList = function(id) {
+        storeReducer({
+            type: GlobalStoreActionType.SET_LIST_MARKED_FOR_DELETION,
+            payload: {id: id}
+        });
+    }
+    
+    // THIS FUNCTION HANDLES DELETING A LIST
+    store.deleteListMarkedForDeletion = function() {
+
+        async function asyncDeleteMarkedList() {
+            let response = await api.deleteTop5ListById(store.listMarkedForDeletion);
+            if (response.data.success) {
+                console.log("Deleted list!");
+                async function asyncGetIdNamePairs() {
+                    let response = await api.getTop5ListPairs();
+                    if (response.data.success) {
+                        let newIdNamePairs = response.data.idNamePairs;
+                        storeReducer({
+                            type: GlobalStoreActionType.DELETE_MARKED_LIST,
+                            payload: { idNamePairs: newIdNamePairs }
+                        });
+                    }
+                }
+                asyncGetIdNamePairs();
+            }
+        }
+        asyncDeleteMarkedList();
+    }
+
     // THIS FUNCTION HANDLES CREATING A NEW LIST
     store.createNewList = function() { 
         
@@ -146,11 +201,6 @@ export const useGlobalStore = () => {
             }
         }
         asyncCreateNewList();
-    }
-
-    // Function will handle deleting a list
-    store.deleteList = function(id) {
-
     }
 
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
@@ -234,10 +284,16 @@ export const useGlobalStore = () => {
         }
         asyncSetCurrentList(id);
     }
+
     store.addMoveItemTransaction = function (start, end) {
         let transaction = new MoveItem_Transaction(store, start, end);
         tps.addTransaction(transaction);
     }
+
+    store.addUpdateItemTransaction = function(newText, oldText) {
+
+    }
+
     store.moveItem = function (start, end) {
         start -= 1;
         end -= 1;
