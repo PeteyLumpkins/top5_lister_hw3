@@ -34,7 +34,9 @@ function ListCard(props) {
     function toggleEdit() {
         let newActive = !editActive;
         if (newActive) {
-            store.setIsListNameEditActive();
+            store.setIsListNameEditActive(true);
+        } else {
+            store.setIsListNameEditActive(false);
         }
         setEditActive(newActive);
     }
@@ -49,7 +51,7 @@ function ListCard(props) {
 
     function handleToggleDeleteModel(event) {
         event.stopPropagation();
-        store.setMarkedDeleteList(event.target.id.substring("delete-list-".length));
+        store.setMarkedDeleteList(idNamePair);
     }
 
     function handleUpdateText(event) {

@@ -22,14 +22,15 @@ function EditToolbar() {
         history.push("/");
         store.closeCurrentList();
     }
-    let editStatus = false;
+    
+    let editStatus = false
     if (store.isListNameEditActive) {
         editStatus = true;
     }
+
     return (
         <div id="edit-toolbar">
             <div
-                disabled={editStatus}
                 id='undo-button'
                 onClick={handleUndo}
                 className={enabledButtonClass}>

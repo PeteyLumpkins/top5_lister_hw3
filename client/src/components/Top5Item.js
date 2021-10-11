@@ -96,6 +96,7 @@ function Top5Item(props) {
                 id={"edit-item-" + (index + 1)}
                 className="list-card-button"
                 value={"\u270E"}
+                disabled={true}
                 />
             {props.text}
             </div>
