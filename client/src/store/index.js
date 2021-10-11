@@ -2,6 +2,8 @@ import { createContext, useState } from 'react'
 import jsTPS from '../common/jsTPS'
 import api from '../api'
 import MoveItem_Transaction from '../transactions/MoveItem_Transaction'
+import UpdateItem_Transaction from '../transactions/UpdateItem_Transaction'
+
 export const GlobalStoreContext = createContext({});
 /*
     This is our global data store. Note that it uses the Flux design pattern,
@@ -18,6 +20,7 @@ export const GlobalStoreActionType = {
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
     ADD_NEW_LIST: "ADD_NEW_LIST",
     SET_LIST_MARKED_FOR_DELETION: "SET_LIST_MARKED_FOR_DELETION",
     DELETE_MARKED_LIST: "DELETE_MARKED_LIST",
@@ -44,6 +47,16 @@ export const useGlobalStore = () => {
     const storeReducer = (action) => {
         const { type, payload } = action;
         switch (type) {
+            case GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false, 
+                    isItemEditActive: payload.editing,
+                    listMarkedForDeletion: null
+                });
+            }
             // DELETES THE MARKED LIST
             case GlobalStoreActionType.DELETE_MARKED_LIST: {
                 return setStore({
@@ -290,8 +303,14 @@ export const useGlobalStore = () => {
         tps.addTransaction(transaction);
     }
 
-    store.addUpdateItemTransaction = function(newText, oldText) {
+    store.addUpdateItemTransaction = function(index, oldText, newText) {
+        let transaction = new UpdateItem_Transaction(store, index, oldText, newText);
+        tps.addTransaction(transaction);
+    }
 
+    store.updateItem = function(index, newText) {
+        store.currentList.items[index] = newText;
+        store.updateCurrentList();
     }
 
     store.moveItem = function (start, end) {
@@ -340,6 +359,14 @@ export const useGlobalStore = () => {
             type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
             payload: null
         });
+    }
+
+    // THIS FUNCTION ENABLES EDITING OF AN ITEM IN A LIST
+    store.setIsItemEditActive = function(isEditing) {
+        storeReducer({
+            type: GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE,
+            payload: {editing: isEditing }
+        })
     }
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
