@@ -142,7 +142,7 @@ export const useGlobalStore = () => {
             case GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE: {
                 return setStore({
                     idNamePairs: store.idNamePairs,
-                    currentList: payload,
+                    currentList: null,
                     newListCounter: store.newListCounter,
                     isListNameEditActive: payload.editing,
                     isItemEditActive: false,
@@ -172,18 +172,19 @@ export const useGlobalStore = () => {
             let response = await api.deleteTop5ListById("" + store.listMarkedForDeletion._id);
             if (response.data.success) {
                 console.log("Deleted list!");
-                async function asyncGetIdNamePairs() {
-                    let response = await api.getTop5ListPairs();
-                    if (response.data.success) {
-                        storeReducer({
-                            type: GlobalStoreActionType.DELETE_MARKED_LIST,
-                            payload: {
-                                idNamePairs: response.data.idNamePairs,
-                            }
-                        });
-                    }  
-                }
-                asyncGetIdNamePairs();
+                // async function asyncGetIdNamePairs() {
+                //     let response = await api.getTop5ListPairs();
+                //     if (response.data.success) {
+                //         storeReducer({
+                //             type: GlobalStoreActionType.DELETE_MARKED_LIST,
+                //             payload: {
+                //                 idNamePairs: response.data.idNamePairs,
+                //             }
+                //         });
+                //     }  
+                // }
+                // asyncGetIdNamePairs();
+                store.loadIdNamePairs();
             }
         }
         asyncDeleteMarkedList();

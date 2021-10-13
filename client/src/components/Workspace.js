@@ -28,6 +28,7 @@ function Workspace() {
                 }
             </div>;
     }
+    
     return (
         <div id="top5-workspace">
             <div id="workspace-edit">

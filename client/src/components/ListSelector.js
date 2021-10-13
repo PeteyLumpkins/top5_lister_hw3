@@ -32,7 +32,7 @@ const ListSelector = () => {
     }
 
     let addListButtonClass = "top5-button";
-    if (store.isListNameEditActive) {
+    if (store.isListNameEditActive || store.listMarkedForDeletion !== null) {
         addListButtonClass = "top5-button-disabled";
     }
 
@@ -40,8 +40,8 @@ const ListSelector = () => {
         <div id="top5-list-selector">
             <div id="list-selector-heading">
                 <input
-                    disabled={store.isListNameEditActive}
-                    type="button"
+                    disabled={store.isListNameEditActive || store.listMarkedForDeletion !== null}
+                      type="button"
                     id="add-list-button"
                     className={addListButtonClass}
                     onClick={handleCreateList}
