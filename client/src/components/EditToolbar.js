@@ -10,19 +10,25 @@ import { useHistory } from 'react-router-dom'
 function EditToolbar() {
     const { store } = useContext(GlobalStoreContext);
     const history = useHistory();
+    let editStatus = store.currentList === null || store.isItemEditActive
 
     function handleUndo() {
-        store.undo();
+        if (editStatus || !store.hasTransactionToUndo) {
+            store.undo();
+        }
     }
     function handleRedo() {
-        store.redo();
+        if (editStatus || !store.hasTransactionToRedo) {
+            store.redo();
+        }
     }
     function handleClose() {
-        history.push("/");
-        store.closeCurrentList();
+        if (!editStatus) {
+            history.push("/");
+            store.closeCurrentList();
+        }
     }
-    
-    let editStatus = store.currentList === null || store.isItemEditActive
+
 
     let undoClass = "top5-button";
     let redoClass = "top5-button";

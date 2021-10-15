@@ -12,6 +12,13 @@ function Workspace() {
     const { store } = useContext(GlobalStoreContext);
     store.history = useHistory();
 
+    let path = store.history.location.pathname
+    let list_key = path.substring("/top5list/".length);
+
+    if (store.currentList === null) {
+        store.setCurrentList(list_key);
+    }
+
     let editItems = "";
     if (store.currentList) {
         editItems = 
@@ -28,7 +35,7 @@ function Workspace() {
                 }
             </div>;
     }
-    
+
     return (
         <div id="top5-workspace">
             <div id="workspace-edit">
