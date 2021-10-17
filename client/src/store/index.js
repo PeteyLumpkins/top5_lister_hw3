@@ -169,21 +169,16 @@ export const useGlobalStore = () => {
     store.deleteListMarkedForDeletion = function() {
 
         async function asyncDeleteMarkedList() {
-            let response = await api.deleteTop5ListById("" + store.listMarkedForDeletion._id);
-            if (response.data.success) {
-                console.log("Deleted list!");
-                // async function asyncGetIdNamePairs() {
-                //     let response = await api.getTop5ListPairs();
-                //     if (response.data.success) {
-                //         storeReducer({
-                //             type: GlobalStoreActionType.DELETE_MARKED_LIST,
-                //             payload: {
-                //                 idNamePairs: response.data.idNamePairs,
-                //             }
-                //         });
-                //     }  
-                // }
-                // asyncGetIdNamePairs();
+
+            try {
+                let response = await api.deleteTop5ListById("" + store.listMarkedForDeletion._id);
+                if (response.data.success) {
+                    console.log("Deleted list!");
+                    
+                }
+            } catch (error) {
+                console.log("Mysterious Error occured.")
+            } finally {
                 store.loadIdNamePairs();
             }
         }

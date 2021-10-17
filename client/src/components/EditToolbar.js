@@ -13,12 +13,12 @@ function EditToolbar() {
     let editStatus = store.currentList === null || store.isItemEditActive
 
     function handleUndo() {
-        if (editStatus || !store.hasTransactionToUndo) {
+        if (!store.isItemEditActive || store.hasTransactionToUndo) {
             store.undo();
         }
     }
     function handleRedo() {
-        if (editStatus || !store.hasTransactionToRedo) {
+        if (!store.isItemEditActive || store.hasTransactionToRedo) {
             store.redo();
         }
     }

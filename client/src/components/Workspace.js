@@ -12,10 +12,9 @@ function Workspace() {
     const { store } = useContext(GlobalStoreContext);
     store.history = useHistory();
 
-    let path = store.history.location.pathname
-    let list_key = path.substring("/top5list/".length);
-
     if (store.currentList === null) {
+        let path = store.history.location.pathname
+        let list_key = path.substring("/top5list/".length);
         store.setCurrentList(list_key);
     }
 
